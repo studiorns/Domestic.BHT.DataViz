@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domestic Brand Health Data Visualizations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="charts.js"></script>
+    <style>
+        /* SONER Logo Animation */
+        @keyframes sonerScan { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes sonerBlip { 0%, 20%, 100% { opacity: 0; } 2%, 15% { opacity: 1; } 3% { transform: scale(1.2); } }
+        
+        /* SONER Logo styles */
+        .soner-logo { display: flex; align-items: center; color: white; font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 300; }
+        .soner-radar { width: 24px; height: 24px; border-radius: 50%; border: 1px solid white; margin: 0 3px; position: relative; background-color: rgba(255, 255, 255, 0.05); overflow: hidden; }
+        .soner-scanner { position: absolute; top: 0; left: 0; width: 100%; height: 100%; animation: sonerScan 4s linear infinite; transform-origin: center; }
+        .soner-scanner::before { content: ''; position: absolute; top: 0; left: 50%; width: 50%; height: 50%; background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.4)); transform-origin: bottom left; clip-path: polygon(0 0, 100% 0, 0 100%); }
+        .soner-scanner::after { content: ''; position: absolute; top: 0; left: 50%; width: 50%; height: 1px; background: linear-gradient(90deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 1)); transform-origin: left center; box-shadow: 0 0 4px rgba(255, 255, 255, 0.8); }
+        .soner-blip { position: absolute; width: 2px; height: 2px; background-color: white; border-radius: 50%; opacity: 0; box-shadow: 0 0 4px white; }
+        .soner-blip:nth-child(1) { top: 25%; left: 30%; animation: sonerBlip 4s 1s infinite; }
+        .soner-blip:nth-child(2) { top: 65%; left: 60%; animation: sonerBlip 4s 2.5s infinite; }
+        .soner-tagline { color: white; font-size: 8px; text-transform: uppercase; font-weight: 500; letter-spacing: 0.5em; margin-left: 10px; opacity: 0.8; }
+
+        :root {
+            --primary: #4285f4;
+            --primary-light: #1a2233;
+            --primary-dark: #8ab4f8;
+            --secondary: #34a853;
+            --secondary-light: #1a2a1e;
+            --warning: #fbbc04;
+            --warning-light: #332a1a;
+            --danger: #ea4335;
+            --danger-light: #331f1e;
+            --gray-100: #1e1e1e;
+            --gray-200: #2d2d2d;
+            --gray-300: #3d3d3d;
+            --gray-400: #4d4d4d;
+            --gray-500: #777777;
+            --gray-600: #a0a0a0;
+            --gray-700: #c0c0c0;
+            --gray-800: #e0e0e0;
+            --gray-900: #f0f0f0;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 6px 12px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 15px 25px rgba(0, 0, 0, 0.6);
+            --radius-sm: 4px;
+            --radius: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --transition: all 0.3s ease;
+            --bg-color: #000000;
+            --card-bg: #121212;
+            --section-bg: #181818;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--gray-800);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1a73e8 0%, #174ea6 100%);
+            color: white;
+            padding: 32px 0;
+            text-align: center;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQ0MCIgaGVpZ2h0PSI0MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IHgxPSIxMDAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiIGlkPSJhIj48c3RvcCBzdG9wLWNvbG9yPSIjRkZGIiBzdG9wLW9wYWNpdHk9Ii4wNSIgb2Zmc2V0PSIwJSIvPjxzdG9wIHN0b3AtY29sb3I9IiNGRkYiIHN0b3Atb3BhY2l0eT0iLjAyIiBvZmZzZXQ9IjEwMCUiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cGF0aCBkPSJNMTQ0MCAyMDBjLTEzMS44LTEyLjktMjY3LjgtMTkuNC00MDgtMTkuNC0xNDAuMiAwLTI3Ni4yIDYuNS00MDggMTkuNFYwaDgxNnYyMDB6IiBmaWxsPSJ1cmwoI2EpIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 0;
+            font-weight: 600;
+            line-height: 1.3;
+            color: var(--gray-900);
+        }
+        
+        h2 {
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        h2 i {
+            margin-right: 12px;
+            color: var(--primary);
+            font-size: 1.25rem;
+        }
+        
+        h3 {
+            font-size: 1.35rem;
+            margin-bottom: 1rem;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+        }
+        
+        h3 i {
+            margin-right: 10px;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        .section {
+            background-color: var(--section-bg);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow);
+            padding: 28px;
+            margin-bottom: 32px;
+            transition: var(--transition);
+            border: 1px solid var(--gray-300);
+            display: none; /* Hide all sections by default */
+        }
+        
+        .section.active {
+            display: block; /* Show only active section */
+        }
+        
+        .section:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        
+        .section h2 {
+            border-bottom: 2px solid var(--gray-200);
+            padding-bottom: 16px;
+            margin-bottom: 28px;
+        }
+        
+        .nav-container {
+            background-color: var(--gray-100);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+        
+        .nav-menu {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            padding: 0;
+            flex-wrap: wrap;
+        }
+        
+        .nav-item {
+            margin: 0;
+        }
+        
+        .nav-link {
+            color: var(--gray-700);
+            text-decoration: none;
+            padding: 1rem 1.5rem;
+            display: block;
+            transition: var(--transition);
+            font-weight: 500;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary);
+            transform: scaleX(0);
+            transition: var(--transition);
+        }
+        
+        .nav-link:hover {
+            color: var(--primary);
+        }
+        
+        .nav-link.active {
+            color: var(--primary);
+        }
+        
+        .nav-link.active::after {
+            transform: scaleX(1);
+        }
+        
+        .chart-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -15px;
+        }
+        
+        .chart-col {
+            flex: 0 0 50%;
+            max-width: 50%;
+            padding: 0 15px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            height: 100%;
+            transition: var(--transition);
+            border: 1px solid var(--gray-300);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chart-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+        }
+        
+        .chart-title i {
+            margin-right: 8px;
+            color: var(--primary);
+        }
+        
+        .chart-description {
+            font-size: 0.9rem;
+            color: var(--gray-700);
+            margin-bottom: 15px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+        
+        .key-insight {
+            background-color: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 12px 16px;
+            margin: 15px 0 0 0;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-size: 0.9rem;
+        }
+        
+        .key-insight strong {
+            color: var(--primary-dark);
+        }
+        
+        .footer {
+            background-color: var(--gray-100);
+            padding: 20px 0;
+            text-align: center;
+            margin-top: 40px;
+            border-top: 1px solid var(--gray-300);
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            margin-top: 20px;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn-secondary {
+            background-color: white;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--primary-light);
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+            color: var(--gray-500);
+            font-size: 1rem;
+            flex-direction: column;
+        }
+        
+        .loading i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .chart-error {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+            color: var(--danger);
+            font-size: 1rem;
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .chart-error i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 992px) {
+            .chart-col {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .nav-menu {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: 5px;
+            }
+            
+            .nav-link {
+                padding: 1rem 1rem;
+                white-space: nowrap;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 16px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .chart-container {
+                height: 220px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+        
+        .print-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            z-index: 1000;
+        }
+        
+        .print-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 6px 16px rgba(26, 115, 232, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 15px;">
+                <div class="soner-logo">
+                    S<div class="soner-radar">
+                        <div class="soner-scanner"></div>
+                        <div class="soner-blip"></div>
+                        <div class="soner-blip"></div>
+                    </div>NER
+                    <span class="soner-tagline">Visual Intelligence</span>
+                </div>
+            </div>
+            <h1>Domestic Brand Health Data Visualizations</h1>
+            <div style="text-align: center; width: 100%; margin: 0 auto;">
+                <h2 style="font-size: 1.3rem; margin-top: 5px; font-weight: 500; display: inline-block;">Department of Culture and Tourism - Abu Dhabi</h2>
+            </div>
+            <p>Interactive Charts and Insights | March 2025</p>
+        </div>
+    </header>
+    
+    <div class="nav-container">
+        <div class="container">
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a class="nav-link active" data-target="brand-health">Brand Health</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-target="visitor-insights">Visitor Insights</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-target="nightlife">Nightlife Analysis</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-target="campaigns">Campaign Effectiveness</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="container">
+        <section id="brand-health" class="section active">
+            <h2><i class="fas fa-chart-line"></i> Brand Health Performance</h2>
+            
+            <div class="chart-row">
+                <div class="chart-col">
+                    <div class="chart-card">
+                        <div class="chart-title"><i class="fas fa-chart-line"></i> Brand Health Metrics Trend</div>
+                        <div class="chart-description">Year-over-year growth in key brand health metrics shows consistent improvement across all indicators.</div>
+                        <div class="chart-container">
+                            <div class="loading" id="brandMetricsChart-loading">
+                                <i class="fas fa-spinner"></i>
+                            </div>
+                            <div class="chart-error" id="brandMetricsChart-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Unable to load chart. Please try refreshing the page.</span>
+                            </div>
+                            <canvas id="brandMetricsChart"></canvas>
+                        </div>
+                        <div class="key-insight">
+                            <strong>Key Insight:</strong> Abu Dhabi has shown the most consistent growth pattern among all emirates, with visitation increasing from 32% in Q3'22 to 58% in Q4'24.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-col">
+                    <div class="chart-card">
+                        <div class="chart-title"><i class="fas fa-bullseye"></i> Marketing Funnel Performance</div>
+                        <div class="chart-description">Percentage of domestic audience at each stage of the marketing funnel. The chart shows funnel stages on the y-axis (left) and percentage values on the x-axis (bottom). The horizontal bars represent: Awareness (72%), Consideration (65%), Intent (62%), and Visitation (58%).</div>
+                        <div class="chart-container">
+                            <div class="loading" id="funnelChart-loading">
+                                <i class="fas fa-spinner"></i>
+                            </div>
+                            <div class="chart-error" id="funnelChart-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Unable to load chart. Please try refreshing the page.</span>
+                            </div>
+                            <canvas id="funnelChart"></canvas>
+                        </div>
+                        <div class="key-insight">
+                            <strong>Key Insight:</strong> The marketing funnel shows strong retention from stage to stage: 90% from awareness to consideration, 89% from consideration to intent, and 78% from intent to visitation, indicating effective marketing at each stage.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-col">
+                    <div class="chart-card">
+                        <div class="chart-title"><i class="fas fa-spider-web"></i> Brand Perception Strengths</div>
+                        <div class="chart-description">Radar chart showing Abu Dhabi's strongest brand associations compared to competitors.</div>
+                        <div class="chart-container">
+                            <div class="loading" id="brandPerceptionChart-loading">
+                                <i class="fas fa-spinner"></i>
+                            </div>
+                            <div class="chart-error" id="brandPerceptionChart-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Unable to load chart. Please try refreshing the page.</span>
+                            </div>
+                            <canvas id="brandPerceptionChart"></canvas>
+                        </div>
+                        <div class="key-insight">
+                            <strong>Key Insight:</strong> Abu Dhabi's strongest associations are with cultural depth (72%), international sports events (71%), beautiful beaches (70%), and interesting museums (69%).
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-col">
+                    <div class="chart-card">
+                        <div class="chart-title"><i class="fas fa-balance-scale"></i> Competitive Positioning</div>
+                        <div class="chart-description">Comparison of key metrics between Abu Dhabi and other emirates.</div>
+                        <div class="chart-container">
+                            <div class="loading" id="competitiveChart-loading">
+                                <i class="fas fa-spinner"></i>
+                            </div>
+                            <div class="chart-error" id="competitiveChart-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Unable to load chart. Please try refreshing the page.</span>
+                            </div>
+                            <canvas id="competitiveChart"></canvas>
+                        </div>
+                        <div class="key-insight">
+                            <strong>Key Insight:</strong> While ranking second to Dubai in ad awareness and visitation, Abu Dhabi outperforms all other emirates by a substantial margin.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="visitor-insights" class="section">
+            <h2><i class="fas fa-user-friends"></i> Visitor Insights</h2>
+            
+            <div class="chart-row">
+                <div class="chart-col">
+                    <div class="chart-card">
+                        <div class="chart-title"><i class="fas fa-map-marker-alt"></i> Visitor Origin</div>
+                        <div class="chart-description">Distribution of domestic visitors by emirate of origin.</div>
+                        <div class="chart-container">
+                            <div class="loading" id="visitorOriginChart-loading">
+                                <i class="fas fa-spinner"></i>
+                            </div>
+                            <div class="chart-error" id="visitorOriginChart-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Unable to load chart. Please try refreshing the page.</span>
+                            </div>
+                            <canvas id="visitorOriginChart"></canvas>
+                        </div>
+                        <div class="key-insight">
+                            <strong>Key Insight:</strong> 96% of domestic visitors come from either Dubai (70%) or Sharjah (26%), highlighting the importance of these two emirates as source markets.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-col">
+                    <div class="chart-card">
+                        <div class="chart-title"><i class="fas fa-users"></i> Visitor Demographics</div>
+                        <div class="chart-description">Age and gender distribution of domestic visitors.</div>
+                        <div class="chart-container">
+                            <div class="loading" id="visitorDemographicsChart-loading">
+                                <i class="fas fa-spinner"></i>
+                            </div>
+                            <div class="chart-error" id="visitorDemographicsChart-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Unable to load chart. Please try refreshing the page.</span>
+                            </div>
+                            <canvas id="visitorDemographicsChart"></canvas>
+                        </div>
+                        <div class="key-insight">
+                            <strong>Key Insight:</strong> 57% of visitors are between 18-39 years of age, and 62% are male, suggesting opportunities for experience development targeting this demographic.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-col">
+                    <div class="chart-card">
+                        <div class="chart-title"><i class="fas fa-clock"></i> Stay Duration Trend</div>
+                        <div class="chart-description">Trend of same-day vs. overnight visitors over time.</div>
+                        <div class="chart-container">
+                            <div class="loading" id="stayDurationChart-loading">
+                                <i class="fas fa-spinner"></i>
+                            </div>
+                            <div class="chart-error" id="stayDurationChart-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Unable to load chart. Please try refreshing the page.</span>
+                            </div>
+                            <canvas id="stayDurationChart"></canvas>
+                        </div>
+                        <div class="key-insight">
+                            <strong>Key Insight:</strong> 67% of domestic visitors are same-day visitors, up from 50% in 2021, representing a significant opportunity to convert these visitors into overnight stays.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-col">
+                    <div class="chart-card">
+                        <div class="chart-title"><i class="fas fa-info-circle"></i> Information Sources</div>
+                        <div class="chart-description">Primary information sources used by visitors when planning their trip.</div>
+                        <div class="chart-container">
+                            <div class="loading" id="infoSourcesChart-loading">
+                                <i class="fas fa-spinner"></i>
+                            </div>
+                            <div class="chart-error" id="infoSourcesChart-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Unable to load chart. Please try refreshing the page.</span>
+                            </div>
+                            <canvas id="infoSourcesChart"></canvas>
+                        </div>
+                        <div class="key-insight">
+                            <strong>Key Insight:</strong> Social media (Instagram 61%, Facebook 60%, TikTok 44%) and online search engines (59%) are the primary information sources, highlighting the importance of digital marketing.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="nightlife" class="section">
+            <h2><i class="fas fa-glass-martini-alt"></i> Nightlife Analysis</h2>
+            
+            <div class="chart-row">
+                <div class="chart-col">
+                    <div class="chart-card">
+                        <div class="chart-title"><i class="fas fa-plane-departure"></i> Nightlife "Leakage" Rate</div>
+                        <div class="chart-description">Percentage of Abu Dhabi residents visiting Dubai for nightlife by demographic segment.</div>
+                        <div class="chart-container">
+                            <div class="loading" id="nightlifeLeakageChart-loading">
+                                <i class="fas fa-spinner"></i>
+                            </div>
+                            <div class="chart-error" id="nightlifeLeakageChart-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Unable to load chart. Please try refreshing the page.</span>
+                            </div>
+                            <canvas id="nightlifeLeakageChart"></canvas>
+                        </div>
+                        <div class="key-insight">
+                            <strong>Key Insight:</strong> Nightlife is particularly important to Emiratis (78%) and Westerners (77%), with these groups showing the highest "leakage" to Dubai (75% and 92% respectively).
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-col">
+                    <div class="chart-card">
+                        <div class="chart-title"><i class="fas fa-wallet"></i> Nightlife Spending Comparison</div>
+                        <div class="chart-description">Comparison of spending on nightlife activities in Abu Dhabi vs. Dubai.</div>
+                        <div class="chart-container">
+                            <div class="loading" id="nightlifeSpendingChart-loading">
+                                <i class="fas fa-spinner"></i>
+                            </div>
+                            <div class="chart-error" id="nightlifeSpendingChart-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Unable to load chart. Please try refreshing the page.</span>
+                            </div>
+                            <canvas id="nightlifeSpendingChart"></canvas>
+                        </div>
+                        <div class="key-insight">
+                            <strong>Key Insight:</strong> Abu Dhabi residents spend significantly more per person on nightlife in Dubai (AED 591) compared to Abu Dhabi (AED 436), representing a substantial economic opportunity.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-col">
+                    <div class="chart-card">
+                        <div class="chart-title"><i class="fas fa-moon"></i> Nightlife Motivators</div>
+                        <div class="chart-description">Factors that would motivate more nightlife participation in Abu Dhabi.</div>
+                        <div class="chart-container">
+                            <div class="loading" id="nightlifeMotivatorsChart-loading">
+                                <i class="fas fa-spinner"></i>
+                            </div>
+                            <div class="chart-error" id="nightlifeMotivatorsChart-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Unable to load chart. Please try refreshing the page.</span>
+                            </div>
+                            <canvas id="nightlifeMotivatorsChart"></canvas>
+                        </div>
+                        <div class="key-insight">
+                            <strong>Key Insight:</strong> The top motivators for increased nightlife participation in Abu Dhabi are wider variety of venues (48%), more vibrant atmosphere (46%), and more affordable venues (42%).
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-col">
+                    <div class="chart-card">
+                        <div class="chart-title"><i class="fas fa-bed"></i> Overnight Stay Rate</div>
+                        <div class="chart-description">Percentage of visitors staying overnight when participating in nightlife activities.</div>
+                        <div class="chart-container">
+                            <div class="loading" id="overnightStayChart-loading">
+                                <i class="fas fa-spinner"></i>
+                            </div>
+                            <div class="chart-error" id="overnightStayChart-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Unable to load chart. Please try refreshing the page.</span>
+                            </div>
+                            <canvas id="overnightStayChart"></canvas>
+                        </div>
+                        <div class="key-insight">
+                            <strong>Key Insight:</strong> 66% of Abu Dhabi residents visiting Dubai for nightlife stay overnight, highlighting the connection between nightlife and accommodation demand.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="campaigns" class="section">
+            <h2><i class="fas fa-ad"></i> Campaign Effectiveness</h2>
+            
+            <div class="chart-row">
+                <div class="chart-col">
+                    <div class="chart-card">
+                        <div class="chart-title"><i class="fas fa-bullhorn"></i> Campaign Recognition Rates</div>
+                        <div class="chart-description">Recognition rates for recent campaigns compared to industry benchmarks.</div>
+                        <div class="chart-container">
+                            <div class="loading" id="campaignRecognitionChart-loading">
+                                <i class="fas fa-spinner"></i>
+                            </div>
+                            <div class="chart-error" id="campaignRecognitionChart-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Unable to load chart. Please try refreshing the page.</span>
+                            </div>
+                            <canvas id="campaignRecognitionChart"></canvas>
+                        </div>
+                        <div class="key-insight">
+                            <strong>Key Insight:</strong> Both the Global Brand Ambassador (49% recognition) and Cultural Heritage Campaign (31% recognition) significantly outperform tourism industry benchmarks (typically 30-35%).
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-col">
+                    <div class="chart-card">
+                        <div class="chart-title"><i class="fas fa-calendar-alt"></i> Quarterly Awareness Growth</div>
+                        <div class="chart-description">Quarter-by-quarter growth in spontaneous awareness, highlighting seasonal patterns.</div>
+                        <div class="chart-container">
+                            <div class="loading" id="quarterlyAwarenessChart-loading">
+                                <i class="fas fa-spinner"></i>
+                            </div>
+                            <div class="chart-error" id="quarterlyAwarenessChart-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Unable to load chart. Please try refreshing the page.</span>
+                            </div>
+                            <canvas id="quarterlyAwarenessChart"></canvas>
+                        </div>
+                        <div class="key-insight">
+                            <strong>Key Insight:</strong> Q2 consistently shows the strongest growth for Abu Dhabi awareness, with the most significant jump occurring between Q1'23 and Q2'23 (from 27% to 39%).
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-col">
+                    <div class="chart-card">
+                        <div class="chart-title"><i class="fas fa-thumbs-up"></i> Campaign Appeal Ratings</div>
+                        <div class="chart-description">Appeal ratings for recent campaigns by demographic segment.</div>
+                        <div class="chart-container">
+                            <div class="loading" id="campaignAppealChart-loading">
+                                <i class="fas fa-spinner"></i>
+                            </div>
+                            <div class="chart-error" id="campaignAppealChart-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Unable to load chart. Please try refreshing the page.</span>
+                            </div>
+                            <canvas id="campaignAppealChart"></canvas>
+                        </div>
+                        <div class="key-insight">
+                            <strong>Key Insight:</strong> The Global Brand Ambassador campaign resonates most strongly with the 25-34 age group (72% appeal), while the Cultural Heritage Campaign performs best with the 45+ demographic (68% appeal).
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-col">
+                    <div class="chart-card">
+                        <div class="chart-title"><i class="fas fa-chart-bar"></i> Media Channel Effectiveness</div>
+                        <div class="chart-description">Comparison of different media channels in terms of reach, engagement, and conversion.</div>
+                        <div class="chart-container">
+                            <div class="loading" id="mediaChannelChart-loading">
+                                <i class="fas fa-spinner"></i>
+                            </div>
+                            <div class="chart-error" id="mediaChannelChart-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Unable to load chart. Please try refreshing the page.</span>
+                            </div>
+                            <canvas id="mediaChannelChart"></canvas>
+                        </div>
+                        <div class="key-insight">
+                            <strong>Key Insight:</strong> Digital channels (social media and search) deliver the highest ROI, with Instagram showing 3.2x higher engagement rates than traditional media channels.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <button class="print-btn" title="Print Dashboard"><i class="fas fa-print"></i></button>
+    
+    <footer class="footer">
+        <div class="container">
+            <p style="margin: 0; color: var(--gray-700); font-size: 0.9rem;">© 2025 Research & Insights Unit | Strategic Marketing & Communications | Department of Culture and Tourism – Abu Dhabi</p>
+        </div>
+    </footer>
+    
+    <script>
+        // Navigation functionality
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                // Remove active class from all links and sections
+                document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+                
+                // Add active class to clicked link
+                this.classList.add('active');
+                
+                // Show corresponding section
+                const targetId = this.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+        
+        // Print functionality
+        document.querySelector('.print-btn').addEventListener('click', function() {
+            window.print();
+        });
+        
+        // Add print media query styles
+        const printStyles = `
+            @media print {
+                body {
+                    background-color: white;
+                }
+                
+                .dashboard-section, .section {
+                    box-shadow: none;
+                    break-inside: avoid;
+                }
+                
+                .print-btn {
+                    display: none;
+                }
+                
+                .section {
+                    display: block !important;
+                }
+                
+                .nav-container {
+                    display: none;
+                }
+            }
+        `;
+        
+        const styleElement = document.createElement('style');
+        styleElement.textContent = printStyles;
+        document.head.appendChild(styleElement);
+    </script>
+</body>
+</html>
