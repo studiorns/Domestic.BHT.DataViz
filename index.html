@@ -7,7 +7,41 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="charts.js"></script>
+    <script>
+        // Wait for window to fully load before initializing charts
+        window.addEventListener('load', function() {
+            console.log("Window fully loaded, initializing charts...");
+            
+            // Make sure Chart.js is loaded
+            if (typeof Chart === 'undefined') {
+                console.error("Chart.js not loaded!");
+                return;
+            }
+            
+            console.log("Chart.js is loaded, initializing charts...");
+            
+            // Load the charts.js script first
+            const script = document.createElement('script');
+            script.src = 'charts.js';
+            script.onload = function() {
+                console.log("Charts script loaded successfully");
+                // Initialize charts after script is loaded
+                if (typeof initCharts === 'function') {
+                    initCharts();
+                } else if (typeof checkChartJsAndInitialize === 'function') {
+                    checkChartJsAndInitialize();
+                }
+            };
+            script.onerror = function() {
+                console.error("Failed to load charts script");
+                // Show error messages for all charts
+                document.querySelectorAll('[id$="-error"]').forEach(el => {
+                    el.style.display = 'flex';
+                });
+            };
+            document.body.appendChild(script);
+        });
+    </script>
     <style>
         /* SONER Logo Animation */
         @keyframes sonerScan { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -876,18 +910,26 @@
     
     <script>
         // Navigation functionality
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', function() {
-                // Remove active class from all links and sections
-                document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
-                document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
-                
-                // Add active class to clicked link
-                this.classList.add('active');
-                
-                // Show corresponding section
-                const targetId = this.getAttribute('data-target');
-                document.getElementById(targetId).classList.add('active');
+        document.addEventListener('DOMContentLoaded', function() {
+            // Store chart instances globally
+            window.chartInstances = window.chartInstances || {};
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function() {
+                    // Remove active class from all links and sections
+                    document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+                    document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+                    
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    
+                    // Show corresponding section
+                    const targetId = this.getAttribute('data-target');
+                    document.getElementById(targetId).classList.add('active');
+                    
+                    // Log the tab change
+                    console.log(`Tab changed to: ${targetId}`);
+                });
             });
         });
         
