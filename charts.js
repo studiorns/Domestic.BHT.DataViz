@@ -390,15 +390,104 @@ function initNightlifeCharts() {
             if (errorElement) errorElement.style.display = 'flex';
         }
         
-        // Nightlife Spending Chart
+        // Nightlife Spending Chart - Direct implementation
         try {
-            createBarChart('nightlifeSpendingChart',
-                ['Abu Dhabi', 'Dubai'],
-                [436, 591],
-                ['#1a73e8', '#ea4335'],
-                false,
-                'AED'
-            );
+            console.log("Creating nightlife spending chart directly...");
+            
+            // Hide loading indicator
+            const loadingElement = document.getElementById('nightlifeSpendingChart-loading');
+            const errorElement = document.getElementById('nightlifeSpendingChart-error');
+            
+            if (loadingElement) loadingElement.style.display = 'none';
+            if (errorElement) errorElement.style.display = 'none';
+            
+            const canvas = document.getElementById('nightlifeSpendingChart');
+            if (!canvas) {
+                console.error("Canvas element with id nightlifeSpendingChart not found");
+                if (errorElement) errorElement.style.display = 'flex';
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.error("Could not get 2D context for canvas nightlifeSpendingChart");
+                if (errorElement) errorElement.style.display = 'flex';
+                return;
+            }
+            
+            // Create chart directly with verified data from Nightlife Survey Report
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Abu Dhabi', 'Dubai'],
+                    datasets: [{
+                        label: 'Average Spending per Person per Outing',
+                        data: [436, 591],
+                        backgroundColor: [
+                            'rgba(26, 115, 232, 0.8)',  // Blue for Abu Dhabi
+                            'rgba(234, 67, 53, 0.8)'    // Red for Dubai
+                        ],
+                        borderColor: [
+                            '#1a73e8',
+                            '#ea4335'
+                        ],
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        barPercentage: 0.6,
+                        categoryPercentage: 0.8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false  // Hide legend for cleaner look
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': AED ' + context.parsed.y;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 700,  // Slightly higher than max value for better visualization
+                            grid: {
+                                display: true,
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return 'AED ' + value;
+                                },
+                                color: '#c0c0c0'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Average Spending (AED)',
+                                color: '#c0c0c0',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#c0c0c0'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            console.log("Nightlife spending chart created successfully");
         } catch (error) {
             console.error("[error] Error creating chart nightlifeSpendingChart:", error);
             const errorElement = document.getElementById('nightlifeSpendingChart-error');
@@ -444,15 +533,106 @@ function initCampaignCharts() {
     try {
         console.log("Starting Campaign charts initialization...");
         
-        // Campaign Recognition Rates Chart
+        // Campaign Recognition Rates Chart - Direct implementation
         try {
-            createBarChart('campaignRecognitionChart',
-                ['Global Brand Ambassador', 'Cultural Heritage Campaign', 'Industry Benchmark'],
-                [49, 31, 33],
-                ['#1a73e8', '#34a853', '#fbbc04'],
-                false,
-                '%'
-            );
+            console.log("Creating campaign recognition rates chart directly...");
+            
+            // Hide loading indicator
+            const loadingElement = document.getElementById('campaignRecognitionChart-loading');
+            const errorElement = document.getElementById('campaignRecognitionChart-error');
+            
+            if (loadingElement) loadingElement.style.display = 'none';
+            if (errorElement) errorElement.style.display = 'none';
+            
+            const canvas = document.getElementById('campaignRecognitionChart');
+            if (!canvas) {
+                console.error("Canvas element with id campaignRecognitionChart not found");
+                if (errorElement) errorElement.style.display = 'flex';
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.error("Could not get 2D context for canvas campaignRecognitionChart");
+                if (errorElement) errorElement.style.display = 'flex';
+                return;
+            }
+            
+            // Create chart directly with verified data
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Global Brand Ambassador', 'Cultural Heritage Campaign', 'Industry Benchmark'],
+                    datasets: [{
+                        label: 'Recognition Rate',
+                        data: [49, 31, 33],
+                        backgroundColor: [
+                            'rgba(26, 115, 232, 0.8)',  // Blue for Global Brand Ambassador
+                            'rgba(52, 168, 83, 0.8)',   // Green for Cultural Heritage Campaign
+                            'rgba(251, 188, 4, 0.8)'    // Yellow for Industry Benchmark
+                        ],
+                        borderColor: [
+                            '#1a73e8',
+                            '#34a853',
+                            '#fbbc04'
+                        ],
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        barPercentage: 0.6,
+                        categoryPercentage: 0.8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false  // Hide legend for cleaner look
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + '%';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 60,  // Slightly higher than max value for better visualization
+                            grid: {
+                                display: true,
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                },
+                                color: '#c0c0c0'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Recognition Rate (%)',
+                                color: '#c0c0c0',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#c0c0c0'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            console.log("Campaign recognition rates chart created successfully");
         } catch (error) {
             console.error("[error] Error creating chart campaignRecognitionChart:", error);
             const errorElement = document.getElementById('campaignRecognitionChart-error');
@@ -477,9 +657,9 @@ function initCampaignCharts() {
             if (errorElement) errorElement.style.display = 'flex';
         }
         
-        // Campaign Appeal Ratings Chart - Direct implementation
+        // Campaign Performance Comparison Chart - Direct implementation
         try {
-            console.log("Creating campaign appeal ratings chart directly...");
+            console.log("Creating campaign performance comparison chart directly...");
             
             // Hide loading indicator
             const loadingElement = document.getElementById('campaignAppealChart-loading');
@@ -502,22 +682,22 @@ function initCampaignCharts() {
                 return;
             }
             
-            // Create chart directly
+            // Create chart directly with verified data from official sources
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['18-24', '25-34', '35-44', '45+'],
+                    labels: ['Ad Recall (T2B%)', 'Correct Association', 'Overall Ad Appeal (T2B%)'],
                     datasets: [
                         {
                             label: 'Global Brand Ambassador',
-                            data: [95, 100, 85, 76],
+                            data: [81, 65, 91],
                             backgroundColor: 'rgba(26, 115, 232, 0.8)',
                             borderColor: '#1a73e8',
                             borderWidth: 1
                         },
                         {
                             label: 'Cultural Heritage Campaign',
-                            data: [68, 78, 96, 100],
+                            data: [73, 74, 88],
                             backgroundColor: 'rgba(52, 168, 83, 0.8)',
                             borderColor: '#34a853',
                             borderWidth: 1
@@ -548,7 +728,7 @@ function initCampaignCharts() {
                         },
                         y: {
                             beginAtZero: true,
-                            max: 120, // Set max to accommodate the highest value (110%)
+                            max: 100, // Set max to 100% as these are percentage values
                             ticks: {
                                 callback: function(value) {
                                     return value + '%';
@@ -568,28 +748,112 @@ function initCampaignCharts() {
             if (errorElement) errorElement.style.display = 'flex';
         }
         
-        // Media Channel Effectiveness Chart
+        // Media Channel Effectiveness Chart - Direct implementation
         try {
-            createRadarChart('mediaChannelChart',
-                ['Reach', 'Engagement', 'Conversion', 'ROI', 'Brand Lift'],
-                [
-                    {
-                        label: 'Social Media',
-                        data: [85, 78, 72, 88, 76],
-                        color: '#1a73e8'
+            console.log("Creating media channel effectiveness chart directly...");
+            
+            // Hide loading indicator
+            const loadingElement = document.getElementById('mediaChannelChart-loading');
+            const errorElement = document.getElementById('mediaChannelChart-error');
+            
+            if (loadingElement) loadingElement.style.display = 'none';
+            if (errorElement) errorElement.style.display = 'none';
+            
+            const canvas = document.getElementById('mediaChannelChart');
+            if (!canvas) {
+                console.error("Canvas element with id mediaChannelChart not found");
+                if (errorElement) errorElement.style.display = 'flex';
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.error("Could not get 2D context for canvas mediaChannelChart");
+                if (errorElement) errorElement.style.display = 'flex';
+                return;
+            }
+            
+            // Create a simplified horizontal bar chart with the top channels from UAE Brand Tracker Q4'24
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Instagram', 'Facebook', 'Search Engines', 'Personal Recommendation', 'TikTok', 'YouTube', 'TripAdvisor', 'Radio'],
+                    datasets: [
+                        {
+                            label: 'Usage Percentage',
+                            data: [61, 60, 59, 55, 44, 39, 39, 28],
+                            backgroundColor: [
+                                'rgba(225, 48, 108, 0.8)',  // Instagram - pink
+                                'rgba(59, 89, 152, 0.8)',   // Facebook - blue
+                                'rgba(52, 168, 83, 0.8)',   // Search Engines - green
+                                'rgba(251, 188, 4, 0.8)',   // Personal Recommendation - yellow
+                                'rgba(238, 29, 82, 0.8)',   // TikTok - red
+                                'rgba(255, 0, 0, 0.8)',     // YouTube - bright red
+                                'rgba(0, 170, 79, 0.8)',    // TripAdvisor - green
+                                'rgba(234, 67, 53, 0.8)'    // Radio - red
+                            ],
+                            borderColor: [
+                                '#E1306C', '#3b5998', '#34a853', '#fbbc04', 
+                                '#ee1d52', '#FF0000', '#00aa4f', '#ea4335'
+                            ],
+                            borderWidth: 1,
+                            categoryPercentage: 0.8,
+                            barPercentage: 0.9
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',  // Horizontal bar chart
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false  // Hide legend for cleaner look
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.x + '%';
+                                }
+                            }
+                        }
                     },
-                    {
-                        label: 'Search',
-                        data: [72, 65, 80, 82, 70],
-                        color: '#34a853'
-                    },
-                    {
-                        label: 'Traditional Media',
-                        data: [68, 45, 52, 48, 58],
-                        color: '#fbbc04'
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 70,  // Slightly higher than max value for better visualization
+                            grid: {
+                                display: true,
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                },
+                                color: '#c0c0c0'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Usage Percentage (%)',
+                                color: '#c0c0c0',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#c0c0c0'
+                            }
+                        }
                     }
-                ]
-            );
+                }
+            });
+            
+            console.log("Media channel effectiveness chart created successfully");
         } catch (error) {
             console.error("[error] Error creating chart mediaChannelChart:", error);
             const errorElement = document.getElementById('mediaChannelChart-error');
@@ -947,127 +1211,6 @@ function createHorizontalBarChart(id, labels, data, colors) {
                                 return value + '%';
                             }
                         }
-                    }
-                }
-            }
-        });
-        
-        console.log(`Chart ${id} created successfully`);
-    } catch (error) {
-        console.error(`[error] Error creating chart ${id}:`, error);
-        const errorElement = document.getElementById(`${id}-error`);
-        if (errorElement) errorElement.style.display = 'flex';
-    }
-}
-
-function createBarChart(id, labels, data, colors, horizontal = false, unit = '%') {
-    try {
-        console.log(`Starting to create bar chart ${id}...`);
-        console.log(`Data:`, data);
-        
-        // Hide loading indicator and show canvas
-        const loadingElement = document.getElementById(`${id}-loading`);
-        const errorElement = document.getElementById(`${id}-error`);
-        
-        if (loadingElement) loadingElement.style.display = 'none';
-        if (errorElement) errorElement.style.display = 'none';
-        
-        const canvas = document.getElementById(id);
-        if (!canvas) {
-            console.error(`Canvas element with id ${id} not found`);
-            if (errorElement) errorElement.style.display = 'flex';
-            return;
-        }
-        
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-            console.error(`Could not get 2D context for canvas ${id}`);
-            if (errorElement) errorElement.style.display = 'flex';
-            return;
-        }
-        
-        // Prepare data
-        let chartData;
-        if (Array.isArray(data) && !Array.isArray(data[0])) {
-            // Single dataset
-            chartData = {
-                labels: labels,
-                datasets: [{
-                    label: 'Value',
-                    data: data,
-                    backgroundColor: colors.map(color => color + 'CC'),
-                    borderColor: colors,
-                    borderWidth: 1
-                }]
-            };
-        } else {
-            // Multiple datasets
-            chartData = {
-                labels: labels,
-                datasets: data.map((dataset, index) => {
-                    // Get color from dataset (support both color and backgroundColor properties)
-                    const color = dataset.color || dataset.borderColor || '#1a73e8';
-                    const bgColor = dataset.backgroundColor || (color + 'CC');
-                    
-                    return {
-                        label: dataset.label,
-                        data: dataset.data,
-                        backgroundColor: bgColor,
-                        borderColor: color,
-                        borderWidth: 1
-                    };
-                })
-            };
-        }
-        
-        // Determine max value for y-axis
-        let maxValue = 100;
-        if (unit === 'AED') {
-            maxValue = Math.max(...data) * 1.2; // 20% headroom
-        }
-        
-        new Chart(ctx, {
-            type: 'bar',
-            data: chartData,
-            options: {
-                indexAxis: horizontal ? 'y' : 'x',
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: Array.isArray(data[0])
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const value = horizontal ? context.parsed.x : context.parsed.y;
-                                return (context.dataset.label || 'Value') + ': ' + (unit === 'AED' ? 'AED ' : '') + value + (unit === '%' ? '%' : '');
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        beginAtZero: true,
-                        ...(horizontal && {
-                            max: maxValue,
-                            ticks: {
-                                callback: function(value) {
-                                    return (unit === 'AED' ? 'AED ' : '') + value + (unit === '%' ? '%' : '');
-                                }
-                            }
-                        })
-                    },
-                    y: {
-                        beginAtZero: true,
-                        ...(!horizontal && {
-                            max: maxValue,
-                            ticks: {
-                                callback: function(value) {
-                                    return (unit === 'AED' ? 'AED ' : '') + value + (unit === '%' ? '%' : '');
-                                }
-                            }
-                        })
                     }
                 }
             }
