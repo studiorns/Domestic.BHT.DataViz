@@ -164,25 +164,93 @@ function initBrandHealthCharts() {
             if (errorElement) errorElement.style.display = 'flex';
         }
         
-        // Competitive Positioning Chart
+        // Competitive Positioning Chart - Direct implementation
         try {
-            createBarChart('competitiveChart',
-                ['Abu Dhabi', 'Dubai', 'Sharjah', 'Ras Al Khaimah', 'Fujairah'],
-                [
-                    {
-                        label: 'Ad Awareness',
-                        data: [72, 85, 42, 38, 25],
-                        color: '#1a73e8'
+            console.log("Creating competitive positioning chart directly...");
+            
+            // Hide loading indicator
+            const loadingElement = document.getElementById('competitiveChart-loading');
+            const errorElement = document.getElementById('competitiveChart-error');
+            
+            if (loadingElement) loadingElement.style.display = 'none';
+            if (errorElement) errorElement.style.display = 'none';
+            
+            const canvas = document.getElementById('competitiveChart');
+            if (!canvas) {
+                console.error("Canvas element with id competitiveChart not found");
+                if (errorElement) errorElement.style.display = 'flex';
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.error("Could not get 2D context for canvas competitiveChart");
+                if (errorElement) errorElement.style.display = 'flex';
+                return;
+            }
+            
+            // Create chart directly
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Abu Dhabi', 'Dubai', 'Sharjah', 'Ras Al Khaimah', 'Fujairah'],
+                    datasets: [
+                        {
+                            label: 'Ad Awareness',
+                            data: [72, 85, 42, 38, 25],
+                            backgroundColor: 'rgba(26, 115, 232, 0.8)',
+                            borderColor: '#1a73e8',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Visitation',
+                            data: [58, 76, 35, 30, 22],
+                            backgroundColor: 'rgba(52, 168, 83, 0.8)',
+                            borderColor: '#34a853',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            display: true
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + '%';
+                                }
+                            }
+                        }
                     },
-                    {
-                        label: 'Visitation',
-                        data: [58, 76, 35, 30, 22],
-                        color: '#34a853'
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
                     }
-                ]
-            );
+                }
+            });
+            
+            console.log("Competitive positioning chart created successfully");
         } catch (error) {
             console.error("[error] Error creating chart competitiveChart:", error);
+            console.error("Error details:", error.message);
+            console.error("Error stack:", error.stack);
             const errorElement = document.getElementById('competitiveChart-error');
             if (errorElement) errorElement.style.display = 'flex';
         }
@@ -409,25 +477,93 @@ function initCampaignCharts() {
             if (errorElement) errorElement.style.display = 'flex';
         }
         
-        // Campaign Appeal Ratings Chart
+        // Campaign Appeal Ratings Chart - Direct implementation
         try {
-            createStackedBarChart('campaignAppealChart',
-                ['18-24', '25-34', '35-44', '45+'],
-                [
-                    {
-                        label: 'Global Brand Ambassador',
-                        data: [65, 72, 58, 52],
-                        color: '#1a73e8'
+            console.log("Creating campaign appeal ratings chart directly...");
+            
+            // Hide loading indicator
+            const loadingElement = document.getElementById('campaignAppealChart-loading');
+            const errorElement = document.getElementById('campaignAppealChart-error');
+            
+            if (loadingElement) loadingElement.style.display = 'none';
+            if (errorElement) errorElement.style.display = 'none';
+            
+            const canvas = document.getElementById('campaignAppealChart');
+            if (!canvas) {
+                console.error("Canvas element with id campaignAppealChart not found");
+                if (errorElement) errorElement.style.display = 'flex';
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.error("Could not get 2D context for canvas campaignAppealChart");
+                if (errorElement) errorElement.style.display = 'flex';
+                return;
+            }
+            
+            // Create chart directly
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['18-24', '25-34', '35-44', '45+'],
+                    datasets: [
+                        {
+                            label: 'Global Brand Ambassador',
+                            data: [95, 100, 85, 76],
+                            backgroundColor: 'rgba(26, 115, 232, 0.8)',
+                            borderColor: '#1a73e8',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Cultural Heritage Campaign',
+                            data: [68, 78, 96, 100],
+                            backgroundColor: 'rgba(52, 168, 83, 0.8)',
+                            borderColor: '#34a853',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            display: true
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + '%';
+                                }
+                            }
+                        }
                     },
-                    {
-                        label: 'Cultural Heritage Campaign',
-                        data: [42, 48, 59, 68],
-                        color: '#34a853'
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            max: 120, // Set max to accommodate the highest value (110%)
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
                     }
-                ]
-            );
+                }
+            });
+            
+            console.log("Campaign appeal ratings chart created successfully");
         } catch (error) {
             console.error("[error] Error creating chart campaignAppealChart:", error);
+            console.error("Error details:", error.message);
+            console.error("Error stack:", error.stack);
             const errorElement = document.getElementById('campaignAppealChart-error');
             if (errorElement) errorElement.style.display = 'flex';
         }
@@ -826,6 +962,9 @@ function createHorizontalBarChart(id, labels, data, colors) {
 
 function createBarChart(id, labels, data, colors, horizontal = false, unit = '%') {
     try {
+        console.log(`Starting to create bar chart ${id}...`);
+        console.log(`Data:`, data);
+        
         // Hide loading indicator and show canvas
         const loadingElement = document.getElementById(`${id}-loading`);
         const errorElement = document.getElementById(`${id}-error`);
@@ -865,13 +1004,19 @@ function createBarChart(id, labels, data, colors, horizontal = false, unit = '%'
             // Multiple datasets
             chartData = {
                 labels: labels,
-                datasets: data.map((dataset, index) => ({
-                    label: dataset.label,
-                    data: dataset.data,
-                    backgroundColor: dataset.color + 'CC',
-                    borderColor: dataset.color,
-                    borderWidth: 1
-                }))
+                datasets: data.map((dataset, index) => {
+                    // Get color from dataset (support both color and backgroundColor properties)
+                    const color = dataset.color || dataset.borderColor || '#1a73e8';
+                    const bgColor = dataset.backgroundColor || (color + 'CC');
+                    
+                    return {
+                        label: dataset.label,
+                        data: dataset.data,
+                        backgroundColor: bgColor,
+                        borderColor: color,
+                        borderWidth: 1
+                    };
+                })
             };
         }
         
