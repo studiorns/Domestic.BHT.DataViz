@@ -286,28 +286,6 @@ function initVisitorInsightsCharts() {
             if (errorElement) errorElement.style.display = 'flex';
         }
         
-        // Visitor Demographics Chart
-        try {
-            createStackedBarChart('visitorDemographicsChart',
-                ['18-24', '25-34', '35-44', '45-54', '55+'],
-                [
-                    {
-                        label: 'Male',
-                        data: [8, 15, 18, 12, 9],
-                        color: '#1a73e8'
-                    },
-                    {
-                        label: 'Female',
-                        data: [5, 10, 11, 7, 5],
-                        color: '#ea4335'
-                    }
-                ]
-            );
-        } catch (error) {
-            console.error("[error] Error creating enhanced stacked bar chart visitorDemographicsChart:", error);
-            const errorElement = document.getElementById('visitorDemographicsChart-error');
-            if (errorElement) errorElement.style.display = 'flex';
-        }
         
         // Stay Duration Trend Chart
         try {
@@ -351,6 +329,118 @@ function initVisitorInsightsCharts() {
         } catch (error) {
             console.error("[error] Error creating enhanced horizontal bar chart infoSourcesChart:", error);
             const errorElement = document.getElementById('infoSourcesChart-error');
+            if (errorElement) errorElement.style.display = 'flex';
+        }
+        
+        // Purpose of Visit Chart - Direct implementation
+        try {
+            console.log("Creating purpose of visit chart directly...");
+            
+            // Hide loading indicator
+            const loadingElement = document.getElementById('visitPurposeChart-loading');
+            const errorElement = document.getElementById('visitPurposeChart-error');
+            
+            if (loadingElement) loadingElement.style.display = 'none';
+            if (errorElement) errorElement.style.display = 'none';
+            
+            const canvas = document.getElementById('visitPurposeChart');
+            if (!canvas) {
+                console.error("Canvas element with id visitPurposeChart not found");
+                if (errorElement) errorElement.style.display = 'flex';
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.error("Could not get 2D context for canvas visitPurposeChart");
+                if (errorElement) errorElement.style.display = 'flex';
+                return;
+            }
+            
+            // Create chart directly with data from Destination Visitor Survey 2024
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Leisure', 'Business', 'VFR', 'B-Leisure', 'Other'],
+                    datasets: [
+                        {
+                            label: 'Overall',
+                            data: [35, 35, 22, 7, 1],
+                            backgroundColor: 'rgba(26, 115, 232, 0.8)',
+                            borderColor: '#1a73e8',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Same-day Visitors',
+                            data: [20, 53, 17, 8, 2],
+                            backgroundColor: 'rgba(52, 168, 83, 0.8)',
+                            borderColor: '#34a853',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Overnight Visitors',
+                            data: [56, 10, 29, 5, 0],
+                            backgroundColor: 'rgba(251, 188, 4, 0.8)',
+                            borderColor: '#fbbc04',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            display: true
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + '%';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            max: 60, // Slightly higher than max value for better visualization
+                            grid: {
+                                display: true,
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                },
+                                color: '#c0c0c0'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Percentage (%)',
+                                color: '#c0c0c0',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            console.log("Purpose of visit chart created successfully");
+        } catch (error) {
+            console.error("[error] Error creating chart visitPurposeChart:", error);
+            const errorElement = document.getElementById('visitPurposeChart-error');
             if (errorElement) errorElement.style.display = 'flex';
         }
         
